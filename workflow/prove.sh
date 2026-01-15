@@ -22,8 +22,9 @@ fi
 
 echo ""
 echo "generating the input for the proof circuit..."
+echo "cli default arguments: $CLI_ARGS"
 
-${NIMCLI_DIR}/cli $CLI_ARGS --output=input.json
+${NIMCLI_DIR}/cli $CLI_ARGS --output=input.json --partial=partial.json
 
 # --- generate the witness ---
 

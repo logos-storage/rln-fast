@@ -20,19 +20,19 @@ type FullConfig = object
   globCfg:     GlobalConfig
   seed:        int64
   outFile:     string
+  partialFile: string
   circomFile:  string
-  partial:     bool
   verbose:     bool
   how_many:    int
 
 const defaultFullCfg =
-  FullConfig( globCfg:    defaultGlobalConfig
-            , seed:       0
-            , outFile:    ""
-            , circomFile: ""
-            , partial:    false
-            , verbose:    false
-            , how_many:   1
+  FullConfig( globCfg:     defaultGlobalConfig
+            , seed:        0
+            , outFile:     ""
+            , partialFile: ""
+            , circomFile:  ""
+            , verbose:     false
+            , how_many:    1
             )
 
 #-------------------------------------------------------------------------------
@@ -42,15 +42,15 @@ proc printHelp() =
   echo "$ ./cli [options] --output=proof_input.json --circom=proof_main.circom"
   echo ""
   echo "available options:"
-  echo " -h, --help                         : print this help"
-  echo " -v, --verbose                      : verbose output (print the actual parameters)"
-  echo " -d, --merkle_depth = <depth>       : Merkle tree depth (default: 20)"
-  echo " -b, --limit_bits   = <bits>        : log2 of maximum number of messages per epoch (default: 16)"
-  echo " -s, --seed         = <seed>        : seed to generate the fake data (eg. 12345; default: random)"
-  echo " -o, --output       = <input.json>  : the JSON file into which we write the proof inputs"
-  echo " -c, --circom       = <main.circom> : the circom main component to create with these parameters"
-  echo " -n, --count        = <K>           : generate K proof inputs at the same time (instead of 1)"
-  echo " -p, --partial                      : generate partial input"
+  echo " -h, --help                          : print this help"
+  echo " -v, --verbose                       : verbose output (print the actual parameters)"
+  echo " -d, --merkle_depth = <depth>        : Merkle tree depth (default: 20)"
+  echo " -b, --limit_bits   = <bits>         : log2 of maximum number of messages per epoch (default: 16)"
+  echo " -s, --seed         = <seed>         : seed to generate the fake data (eg. 12345; default: random)"
+  echo " -o, --output       = <input.json>   : the JSON file into which we write the full proof inputs"
+  echo " -p, --partial      = <partial.json> : the JSON file into which we write the partial inputs"
+  echo " -c, --circom       = <main.circom>  : the circom main component to create with these parameters"
+  echo " -n, --count        = <K>            : generate K proof inputs at the same time (instead of 1)"
   echo ""
 
   quit()
@@ -84,8 +84,8 @@ proc parseCliOptions(): FullConfig =
       of "b", "limit_bits"    : globCfg.limit_bits    = parseInt(value)
       of "s", "seed"          : fullCfg.seed          = int64(parseInt(value))
       of "o", "output"        : fullCfg.outFile       = value
+      of "p", "partial"       : fullCfg.partialFile   = value
       of "c", "circom"        : fullCfg.circomFile    = value
-      of "p", "partial"       : fullCfg.partial       = true
       of "n", "count"         : fullCfg.how_many      = parseInt(value)
       else:
         echo "Unknown option: ", key
@@ -114,7 +114,6 @@ proc printConfig(fullCfg: FullConfig) =
   echo "merkle_depth    = " & ($globCfg.merkle_depth)
   echo "limit_bits      = " & ($globCfg.limit_bits)
   echo "random seed     = " & ($fullCfg.seed)
-  echo "partial         = " & ($fullCfg.partial)
   echo "how many inputs = " & ($fullCfg.how_many)
 
 #-------------------------------------------------------------------------------
@@ -159,16 +158,23 @@ when isMainModule:
     echo "writing circom main component into `" & fname & "`"
     writeCircomMainComponent(fullCfg, fname)
 
-  if fullCfg.outFile != "":
-    let fname      = fullCfg.outFile
+  if (fullCfg.outFile != "") or (fullCfg.partialFile != ""):
+
+    if (globCfg.merkle_depth > 16):
+      echo "note: for depth > 16 this may take a while... (we are generating a full Poseidon2 Merkle tree)"
+
     let secretTree = genTreeWithSecrets( globCfg )
     let prfInput   = genProofInput( globCfg , secretTree )
-    if fullCfg.partial:
+
+    if fullCfg.outFile != "":
+      let fname = fullCfg.outFile
+      echo "writing full proof input into `" & fname & "`..."
+      exportProofInput( fname, prfInput )
+
+    if fullCfg.partialFile != "":
+      let fname = fullCfg.partialFile
       echo "writing partial proof input into `" & fname & "`..."
       let partial = extractPartialInputs( prfInput )
       exportPartialInput( fname, partial )
-    else:
-      echo "writing full proof input into `"    & fname & "`..."
-      exportProofInput( fname, prfInput )
 
   echo "done"

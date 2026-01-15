@@ -96,7 +96,7 @@ depends on (these are: maxdepth, maxslots, cellsize, blocksize, nsamples).
 
 ### Generate an input to the circuit
 
-    $ source ../cli_args.sh && ../../reference/nim/proof_input/cli $CLI_ARGS -v --output=input.json
+    $ source ../cli_args.sh && ../../test-input/cli $CLI_ARGS -v --output=input.json --partial=partial.json
 
 ### Generate the witness
 

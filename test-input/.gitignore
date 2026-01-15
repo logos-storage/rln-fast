@@ -2,3 +2,4 @@
 cli
 *.circom
 *.json
+tmp/

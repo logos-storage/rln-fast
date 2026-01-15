@@ -7,6 +7,7 @@ Quickstart:
     $ nimble build cli
     $ ./cli --help
 
-Example:
+Examples:
 
-    $ ./cli -v --merkle_depth=18 --limit_bits=12 --circom=main.circom --output=input.json
+    $ ./cli -v --merkle_depth=18 --limit_bits=12 --circom=main.circom --output=input.json --partial=partial.json
+    $ ./cli -v -d=16 -b=10 --output=tmp/input.json --partial=tmp/partial.json

@@ -35,7 +35,7 @@ proc genTreeWithSecrets*(globCfg: GlobalConfig): TreeWithSecrets =
 
   for i in 0..<N:
     let secret_key = randomF()
-    let msg_limit  = min( 1 , rand(M) )
+    let msg_limit  = max( 1 , rand(M) )
     let public_key = compress( secret_key, intToBN254(msg_limit) );
 
     assert( msg_limit <= M , "msg limit hard bound failed")
