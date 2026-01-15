@@ -22,19 +22,18 @@ To have an overview of what all the different steps and files are, see [PROOFS.m
 - furthermore install `circom-witnesscalc`: <https://github.com/iden3/circom-witnesscalc/> (note: we need the legacy `build-circuit` version!)
 - install Nim: <https://nim-lang.org/>
 
-TODO: fix this: 
 Build the Nim cli proof input generator:
 
-    $ cd ../reference/nim/proof_input/
+    $ cd ../test-input
     $ nimble build -d:release cli
-    $ cd ../../../workflow
+    $ cd ../workflow
 
 ### Powers of tau setup
 
 Either download a ready-to-use "powers of tau" setup file (section 7), or generate one
 youself using `snarkjs` (sections 1..7), see the README here: <https://github.com/iden3/snarkjs>
 
-Size `2^13` (file size about 10MB) should be big enough:
+Size `2^13 = 8192` (file size about 10MB) should be big enough:
 
     $ cd ../ceremony
     $ wget https://storage.googleapis.com/zkevm/ptau/powersOfTau28_hez_final_13.ptau

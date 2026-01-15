@@ -12,18 +12,18 @@ cd build
 
 if command -v build-circuit
 then
-  CIRCUIT_INCLUDES="-l${CIRCUIT_LIB_DIR} -l${CIRCUIT_POS_DIR} -l${CIRCUIT_PRF_DIR}"
-  build-circuit ${CIRCUIT_MAIN}.circom ${CIRCUIT_MAIN}_graph.bin ${CIRCUIT_INCLUDES}
+  build-circuit ${CIRCUIT_MAIN}.circom ${CIRCUIT_MAIN}.graph ${CIRCUIT_INCLUDES}
 else
   echo " "
-  echo "\`circom-witnesscalc\` not found; skipping graph extraction"
+  echo "\`circom-witnesscalc\` (in particular \`build-circuit\') not found; skipping graph extraction"
 fi
 
 # --- generate input for the circuit ---
 
 echo ""
 echo "generating the input for the proof circuit..."
-${NIMCLI_DIR}/cli $CLI_ARGS -v --output=input.json
+
+${NIMCLI_DIR}/cli $CLI_ARGS --output=input.json
 
 # --- generate the witness ---
 

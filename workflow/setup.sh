@@ -10,15 +10,13 @@ cd build
 
 # --- generate the main component ---
 
-### ${NIMCLI_DIR}/cli $CLI_ARGS -v --circom=${CIRCUIT_MAIN}.circom
-
-cp ${CIRCUIT_ROOT}/example_main.circom ./${CIRCUIT_MAIN}.circom
+# cp ${CIRCUIT_ROOT}/example_main.circom ./${CIRCUIT_MAIN}.circom
+${NIMCLI_DIR}/cli $CLI_ARGS --circom=${CIRCUIT_MAIN}.circom
 
 # --- compile the circuit ---
 
 echo ""
 start=`date +%s`
-CIRCUIT_INCLUDES="-l${CIRCUIT_ROOT} -l${CIRCUIT_POS_DIR}"
 circom --r1cs --wasm --O2 ${CIRCUIT_INCLUDES} ${CIRCUIT_MAIN}.circom
 end=`date +%s`
 echo "Compiling the circuit took `expr $end - $start` seconds."

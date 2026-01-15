@@ -5,8 +5,7 @@ MY_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 source ${MY_DIR}/params.sh
 
 CLI_ARGS="--merkle_depth=${MERKLE_DEPTH} \
- --limit_bits=${LIMIT_BITS} \
- --seed=$SEED"
+ --limit_bits=${LIMIT_BITS}"
 
 if [[ "$1" == "--export" ]]
 then

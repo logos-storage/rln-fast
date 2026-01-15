@@ -34,6 +34,9 @@ template RangeCheck(limit_bits) {
   signal input what;
   signal input limit;
 
+  assert( limit >  0             );
+  assert( limit <= 2**limit_bits );
+
   _ <== ToBits(limit_bits)( what );                  // 0 <= what             < 2^limit_bits 
   _ <== ToBits(limit_bits)( limit - 1 - what );      // 0 <= limit - 1 - what < 2^limit_bits
 

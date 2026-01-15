@@ -13,15 +13,59 @@ Our [`circom`](https://docs.circom.io/) circuit is very similar to the one in [t
 
 TODO after the implementation :)
 
+We use the default circuit parameters:
+
+ - `LIMIT_BITS = 16` (max 65536 messages per epoch per user)
+ - `MERKLE_DEPTH = 20` (max 1 million registered users)
+
+Circuit sizes
+
+- witness size = 5637
+- unchanging   = 5123
+- remaining    = 514
+
+So we can see that only less than 10% of the circuit is changing at every proof generation, the rest is changing when a new user registers (and thus the Merkle tree changes).
+
 ### Differences from the PSE circuit
 
-Note that we are not generic in the curve/field choice, requiring BN254 curve. This is only a limitation of the implementation of this PoC, it would work exactly the same with eg. BLS12-381.
+Note that we are not generic in the curve/field choice, requiring the BN254 curve. This is only a limitation of the implementation of this PoC, it would work exactly the same with eg. BLS12-381.
 
 Actual differences:
 
 - we use Poseidon2 hash instead of `circomlib`'s Poseidon 
 - we only use the Poseidon2 permutation with fixed width `t=3` (for simplicity)
-- when computing `a1`, we use the formula `a1 := H(sk+j|ext)` instead of `H(sk|ext|j)`, as this results in one less hash invocation (but shouldn't really cause any difference)
+- when computing `a1`, we use the formula `a1 := H(sk+j|ext)` instead of `H(sk|ext|j)`, as this results in one less `t=3` hash invocation (but this shouldn't really cause any issues, as`sk` is authenticated and `j` is range checked)
+- the Merkle root is an input, not an output (you won't forget to check out externally)
+- we input the Merkle leaf index directly, not as bits (you need check them to be bits anyway, so this is essentially free; and somewhat simpler to use)
+- no external dependencies
+
+Remarks: 
+
+1. if one feels "uneasy" with `sk+j` in `a1`, an  alternative while still keeping `t=3` would be to use `a1 = H(H(sk|ext)|j)`. This is more expensive (an extra hash invocation), but the inner hash `H(sk|ext)` only changes once per epoch. So technically one could do a three-layered computation: Precompute most of the things when the Merkle root changes; precompute this one hash at the start of epoch; and finish at each message. We don't implement this 3 layers here, as it would add a lot of complexity.
+2. the computation `local_null = H(a1)` could be optimized by using a `t=2` Poseidon instance (instead of `t=3`). We don't do that here because the lack of pre-made such Poseidon2 instance.
+
+### Circuit I/O
+
+Public inputs:
+
+- `"merkle_root"` (rarely changes)
+- `"ext_null"` (changes once per epoch)
+- `"msg_hash"` (changes at each message)
+
+Private inputs:
+
+- `"secret_key"` (never changes)
+- `"msg_limit"` (never changes)
+- `"leaf_idx"` (normally never changes, though I guess in theory the registry could "garbage collect" once a while)
+- `"merkle_path"` (changes only when the Merkle root  changes)
+- `"msg_idx"` (changes at each message)
+
+Public outputs:
+
+- `"y_value"`
+- `"local_null"` 
+
+We want to precalculate the part of the witness which only depends on the rarely changing inputs, including `"merkle_path"`.
 
 ### Partial witness generation
 
@@ -57,5 +101,4 @@ $$\sum_{j\in \mathcal{F}}^M z_j*[\mathcal{A}_j(\tau)]_1 $$
 where $\mathcal{F}\subset[1\dots M]$ is the set of witness indices which are unchanged, and the the remaing sum (over the complement indices) at the final proof generation.
 
 The only other significant computation is computing the quotient polynomial; that's usually done with FFT. Some part of that can be partially precomputed, but probably won't give a significant speedup.
-
 

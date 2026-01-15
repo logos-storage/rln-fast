@@ -8,9 +8,9 @@ include "misc.circom";
 template RLN(limit_bits, merkle_depth) {
 
   // public input
-  signal input msg_hash;                    // x = hash of the message
-  signal input ext_null;                    // the external "nullifier" ext = H(protocol|epoch)
   signal input merkle_root;                 // the Merkle root we check against
+  signal input ext_null;                    // the external "nullifier" ext = H(protocol|epoch)
+  signal input msg_hash;                    // x = hash of the message
 
   // private input
   signal input secret_key;                  // the user's secret key
@@ -24,11 +24,10 @@ template RLN(limit_bits, merkle_depth) {
   signal output local_null;                 // the "epoch-local nullifier" null = H(a1) (to detect repeated a1)
 
   // computations
-  signal pk       <== Compress()( secret_key , msg_limit );           // public key - this doesn't ever change
-  signal pre_a1   <== Compress()( secret_key , ext_null  );           // H(sk|ext)  - this doesn't change often
-  signal a1       <== Compress()( pre_a1 , msg_idx );                 // a1 = H(H(sk|ext)|j)
-  local_null      <== Compress()( a1 , 0 );                           // H(a1);
-  y_value         <== secret_key + msg_hash * a1;                     // y = sk + x*a1
+  signal pk       <== Compress()( secret_key , msg_limit );            // public key - this doesn't ever change
+  signal a1       <== Compress()( secret_key + msg_idx , ext_null );   // a1 = Hs(sk+j|ext)
+  local_null      <== Compress()( a1 , 0 );                            // H(a1);
+  y_value         <== secret_key + msg_hash * a1;                      // y = sk + x*a1
 
   // checks
   RangeCheck (limit_bits)  ( msg_idx , msg_limit );                           // range check for the message index
