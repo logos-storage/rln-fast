@@ -32,13 +32,13 @@ So we can see that only less than 10% of the circuit is changing at every proof 
 
 Single-threaded (macbook pro M2), excluding witness generation:
 
-    the quotient (FFTs) took 0.0182 seconds
-    pi_A (G1 MSM)       took 0.0263 seconds
-    rho  (G1 MSM)       took 0.0306 seconds
-    pi_B (G2 MSM)       took 0.1572 seconds
-    pi_C (2x G1 MSM)    took 0.0709 seconds
-    --------------------------------------
-    full proof          took 0.3051 seconds
+    the quotient (FFTs) took 0.0151 seconds
+    pi_A (G1 MSM)       took 0.0203 seconds
+    rho  (G1 MSM)       took 0.0243 seconds
+    pi_B (G2 MSM)       took 0.0869 seconds
+    pi_C (2x G1 MSM)    took 0.0528 seconds
+    ---------------------------------------
+    full proof          took 0.2009 seconds
 
 From this we can see that $\pi_B$ dominates, which is a good sign.
 
