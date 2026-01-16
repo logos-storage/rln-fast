@@ -11,7 +11,9 @@ Our [`circom`](https://docs.circom.io/) circuit is very similar to the one in [t
 
 ### Benchmarks
 
-TODO after the implementation :)
+TODO: proper benchmarking; but for some preliminary numbers, see below:
+
+#### Circuit parameters
 
 We use the default circuit parameters:
 
@@ -25,6 +27,33 @@ Circuit sizes
 - remaining    = 514
 
 So we can see that only less than 10% of the circuit is changing at every proof generation, the rest is changing when a new user registers (and thus the Merkle tree changes).
+
+#### Full proof with `nim-groth16`
+
+Single-threaded (macbook pro M2), excluding witness generation:
+
+    the quotient (FFTs) took 0.0182 seconds
+    pi_A (G1 MSM)       took 0.0263 seconds
+    rho  (G1 MSM)       took 0.0306 seconds
+    pi_B (G2 MSM)       took 0.1572 seconds
+    pi_C (2x G1 MSM)    took 0.0709 seconds
+    --------------------------------------
+    full proof          took 0.3051 seconds
+
+From this we can see that $\pi_B$ dominates, which is a good sign.
+
+Some preliminary numbers for the partial proofs:
+
+    generating full witness    : 0.0013 seconds
+    generating full proof      : 0.2015 seconds
+
+    generating partial witness : 0.0021 seconds
+    generating partial proof   : 0.1362 seconds
+    finishing partial proof    : 0.0630 seconds
+
+So we can already see a nice speedup of about 300%.
+
+Note: This very much just hacked together, and there are further optimization opportunities.
 
 ### Differences from the PSE circuit
 
@@ -101,4 +130,5 @@ $$\sum_{j\in \mathcal{F}}^M z_j*[\mathcal{A}_j(\tau)]_1 $$
 where $\mathcal{F}\subset[1\dots M]$ is the set of witness indices which are unchanged, and the the remaing sum (over the complement indices) at the final proof generation.
 
 The only other significant computation is computing the quotient polynomial; that's usually done with FFT. Some part of that can be partially precomputed, but probably won't give a significant speedup.
+
 

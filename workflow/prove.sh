@@ -48,7 +48,7 @@ then
 fi
 
 # PROVER="zikkurat"
-# PROVER="nim"
+PROVER="nim"
 
 echo ""
 echo "creating the proof... using prover: \`$PROVER\`"
@@ -62,7 +62,7 @@ case $PROVER in
     time rapidsnark ${CIRCUIT_MAIN}.zkey witness.wtns proof.json public.json
     ;;
   nim)
-    time nim-groth16 -tpv --zkey=${CIRCUIT_MAIN}.zkey --wtns=witness.wtns -o=proof.json -i=public.json
+    time nim-groth16 -tpv --nthreads=1 --zkey=${CIRCUIT_MAIN}.zkey --wtns=witness.wtns -o=proof.json -i=public.json
     ;;
   zikkurat)
     time zikkurat-groth16 -tpv --zkey=${CIRCUIT_MAIN}.zkey --wtns=witness.wtns # -o=proof.json -i=public.json

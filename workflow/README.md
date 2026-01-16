@@ -123,6 +123,10 @@ The output of this step will consist of:
 - `proof.json` containing the proof itself
 - `public.json` containing the public inputs
 
+### Check partial proof timings
+
+    $ DIR=<...> ./prover_cli -i=$DIR/input.json -p=$DIR/partial.json -g=$DIR/rln_main.graph -z=$DIR/rln_main.zkey
+
 ### Verify the proof (on CPU)
 
     $ snarkjs groth16 verify rln_main_verification_key.json public.json proof.json

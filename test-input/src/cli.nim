@@ -1,4 +1,6 @@
 
+# === test input generator CLI ===
+
 {. warning[UnusedImport]:off .}
 
 import sugar
@@ -9,10 +11,10 @@ import std/parseopt
 
 import std/random
 
-import types
-import json/bn254
-import gen_inputs
-import misc
+import rln/types
+import rln/json/bn254
+import rln/gen_inputs
+import rln/misc
 
 #-------------------------------------------------------------------------------
 

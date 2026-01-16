@@ -1,5 +1,10 @@
 .DS_Store
 cli
+prover_cli
 *.circom
 *.json
 tmp/
+nimble.develop
+nimble.paths
+nimble.lock
+config.nims
