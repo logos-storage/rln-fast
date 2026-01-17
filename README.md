@@ -1,7 +1,7 @@
 rln-fast
 --------
 
-This is a proof-of-concept implemetation (in Nim) of the following idea:
+This is a proof-of-concept implementation (in Nim) of the following idea:
 
 We want to speed up the proof generation of [Rate Limiting Nullifiers](https://rate-limiting-nullifier.github.io/rln-docs/) (RLN), by exploiting the following simple observation:
 
@@ -26,7 +26,7 @@ Circuit sizes:
 - unchanging   = 5123 (can be precalculated)
 - remaining    = 514 (to be done each time)
 
-So we can see that only less than 10% of the circuit is changing at every proof generation, the rest is changing only when a new user registers (and thus the Merkle tree changes).
+So we can see that only less than 10% of the witness is changing at every proof generation, the rest is changing only when a new user registers (and thus the Merkle tree changes).
 
 #### Full proof with `nim-groth16`
 
@@ -40,7 +40,8 @@ Single-threaded (macbook pro M2), excluding witness generation:
     ---------------------------------------
     full proof          took 0.2009 seconds
 
-From this we can see that $\pi_B$ dominates, which is a good sign.
+From this we can see that $\pi_B$ dominates, which is a good sign. We can also see that $\pi_C$ is significant too,
+which is a less good sign. That's actually two computations, one of which we can speed up, the other one, not.
 
 Some preliminary numbers for the partial proofs:
 
