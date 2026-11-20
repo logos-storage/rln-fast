@@ -8,24 +8,6 @@ source ./cli_args.sh
 mkdir -p build 
 cd build
 
-# --- export the witness computation graph ---
-
-if command -v build-circuit
-then
-  build-circuit ${CIRCUIT_MAIN}.circom ${CIRCUIT_MAIN}.graph ${CIRCUIT_INCLUDES}
-else
-  echo " "
-  echo "\`circom-witnesscalc\` (in particular \`build-circuit\') not found; skipping graph extraction"
-fi
-
-# --- generate input for the circuit ---
-
-echo ""
-echo "generating the input for the proof circuit..."
-echo "cli default arguments: $CLI_ARGS"
-
-${NIMCLI_DIR}/cli $CLI_ARGS --output=input.json --partial=partial.json
-
 # --- generate the witness ---
 
 start=`date +%s`
@@ -74,6 +56,14 @@ case $PROVER in
 esac
 end=`date +%s`
 echo "Creating the proof took `expr $end - $start` seconds."
+
+# --- create the partial proof ---
+
+echo ""
+echo "--------------------------------------------------------------------------"
+echo ""
+
+${NIMCLI_DIR}/prover_cli -i=input.json -p=partial.json -g=${CIRCUIT_MAIN}.graph -z=${CIRCUIT_MAIN}.zkey -r=${CIRCUIT_MAIN}.r1cs
 
 # --- verify the proof ---
 

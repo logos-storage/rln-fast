@@ -9,6 +9,7 @@ CIRCUIT_ROOT="${ORIG}/../circuit/"
 CIRCUIT_POS_DIR="${CIRCUIT_ROOT}/poseidon2/"
 CIRCUIT_INCLUDES="-l${CIRCUIT_ROOT} -l${CIRCUIT_POS_DIR}"
 
+# PTAU_FILE="powersOfTau28_hez_final_14.ptau"
 PTAU_FILE="powersOfTau28_hez_final_13.ptau"
 PTAU_PATH="${PTAU_DIR}/${PTAU_FILE}"
 

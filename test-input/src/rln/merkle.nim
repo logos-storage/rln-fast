@@ -1,5 +1,5 @@
 
-import poseidon2/compress
+import poseidon2/compress as posei
 
 import ./types
 import ./misc
@@ -68,9 +68,9 @@ func checkMerkleInclusionProof*(expected_root: F, proof: MerkleProof): bool =
   for i in 0..<proof.depth:
     var next : F 
     if isEven(idx):
-      next = compress( this , path[i] )
+      next = posei.compression( this , path[i] )
     else: 
-      next = compress( path[i] , this )
+      next = posei.compression( path[i] , this )
     idx  = (idx shr 1)
     this = next
 
@@ -101,9 +101,9 @@ proc buildMerkleTree*( leaf_hashes: seq[F] ): MerkleTree =
     for k in 0..<H:
       let j = 2*k
       if j+1 < N:
-        next[k] = compress( prev[j] , prev[j+1] )
+        next[k] = posei.compression( prev[j] , prev[j+1] )
       else:
-        next[k] = compress( prev[j] , zeroF     )
+        next[k] = posei.compression( prev[j] , zeroF     )
 
     layers[i] = next 
     prev      = next        

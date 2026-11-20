@@ -8,8 +8,9 @@ So the below is more like an explanation.
 To run the full workflow:
 
 - set the parameters by editing `params.sh`
-- run `setup.sh` to do the circuit-specific setup
-- run `prove.sh` to generate input, compute witness and create (and verify) the proof
+- run `setup.sh` to do the circuit-specific setup (this is somewhat slow)
+- run `input.sh` to generate input, both partial and full (this is also quite slow...)
+- run `prove.sh` to compute witness and create (and verify) the proof
 
 NOTE: the examples below assume `bash`. In particular, it won't work with `zsh` 
 (which is the dafault on newer macOS)! Because, you know, reasons...

@@ -52,6 +52,7 @@ proc printHelp() =
   echo " -o, --output       = <input.json>   : the JSON file into which we write the full proof inputs"
   echo " -p, --partial      = <partial.json> : the JSON file into which we write the partial inputs"
   echo " -c, --circom       = <main.circom>  : the circom main component to create with these parameters"
+  echo " -g, --griffin                       : use griffin hash"
   echo " -n, --count        = <K>            : generate K proof inputs at the same time (instead of 1)"
   echo ""
 
@@ -84,11 +85,12 @@ proc parseCliOptions(): FullConfig =
       of "v", "verbose"       : fullCfg.verbose       = true
       of "d", "merkle_depth"  : globCfg.merkle_depth  = parseInt(value) 
       of "b", "limit_bits"    : globCfg.limit_bits    = parseInt(value)
+      of "g", "griffin"       : globCfg.griffin       = true
+      of "n", "count"         : fullCfg.how_many      = parseInt(value)
       of "s", "seed"          : fullCfg.seed          = int64(parseInt(value))
       of "o", "output"        : fullCfg.outFile       = value
       of "p", "partial"       : fullCfg.partialFile   = value
       of "c", "circom"        : fullCfg.circomFile    = value
-      of "n", "count"         : fullCfg.how_many      = parseInt(value)
       else:
         echo "Unknown option: ", key
         echo "use --help to get a list of options"
@@ -115,6 +117,7 @@ proc printConfig(fullCfg: FullConfig) =
   # echo "hash function   = Poseidon2"
   echo "merkle_depth    = " & ($globCfg.merkle_depth)
   echo "limit_bits      = " & ($globCfg.limit_bits)
+  echo "griffin         = " & ($globCfg.griffin)
   echo "random seed     = " & ($fullCfg.seed)
   echo "how many inputs = " & ($fullCfg.how_many)
 
@@ -131,7 +134,10 @@ proc writeCircomMainComponent(fullCfg: FullConfig, fname: string) =
   defer: f.close()
 
   f.writeLine("pragma circom 2.1.1;")
-  f.writeLine("include \"rln_proof.circom\";")
+  if fullCfg.globCfg.griffin:
+    f.writeLine("include \"rln_proof_griffin.circom\";")
+  else:
+    f.writeLine("include \"rln_proof.circom\";")
   f.writeLine("// argument order convention: RLN(limit_bits, merkle_depth)")
   f.writeLine("component main {public [msg_hash, ext_null, merkle_root]} = RLN" & ($params) & ";")
 

@@ -4,7 +4,8 @@
 import std/options
 
 import poseidon2/types
-import poseidon2/compress
+import poseidon2/compress         as posei
+import poseidon2/griffin/compress as griffin
 
 import ./types
 import ./merkle
@@ -30,11 +31,25 @@ proc simulateRLNProof*( globCfg: GlobalConfig, inp: ProofInput, verbose: bool): 
       echo "rln proof: message index range check failed"
     return none(ProofOutput)
 
-  let public_key : F = compress( inp.secret_key , intToBN254(inp.msg_limit) )
-  let sk_plus_j  : F = addF( inp.secret_key ,  intToBN254(inp.msg_idx) )
-  let a1         : F = compress( sk_plus_j , inp.ext_null )
-  let y_value    : F = addF( inp.secret_key , mulf( inp.msg_hash , a1 ) )
-  let local_null : F = compress( a1 , intToBN254(0) )
+  var public_key : F 
+  var sk_plus_j  : F 
+  var a1         : F 
+  var y_value    : F 
+  var local_null : F 
+
+  if globCfg.griffin:
+    public_key = griffin.compress( inp.secret_key , intToBN254(inp.msg_limit) )
+    sk_plus_j  = addF( inp.secret_key ,  intToBN254(inp.msg_idx) )
+    a1         = griffin.compress( sk_plus_j , inp.ext_null )
+    y_value    = addF( inp.secret_key , mulf( inp.msg_hash , a1 ) )
+    local_null = griffin.compress( a1 , intToBN254(0) )
+
+  else:
+    public_key = posei.compression( inp.secret_key , intToBN254(inp.msg_limit) )
+    sk_plus_j  = addF( inp.secret_key ,  intToBN254(inp.msg_idx) )
+    a1         = posei.compression( sk_plus_j , inp.ext_null )
+    y_value    = addF( inp.secret_key , mulf( inp.msg_hash , a1 ) )
+    local_null = posei.compression( a1 , intToBN254(0) )
 
   let merkle_proof = MerkleProof(
           leafIndex   : inp.leaf_idx

@@ -5,6 +5,7 @@ prover_cli
 *.json
 tmp/
 nimble.develop
-nimble.paths
+nimble.paths*
 nimble.lock
+nimbledeps
 config.nims

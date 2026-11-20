@@ -1,7 +1,9 @@
 
 import std/random
 
-import poseidon2/compress
+import poseidon2/compress         as posei
+import poseidon2/griffin/compress as griffin
+import poseidon2/io
 
 import ./types
 import ./misc
@@ -36,7 +38,12 @@ proc genTreeWithSecrets*(globCfg: GlobalConfig): TreeWithSecrets =
   for i in 0..<N:
     let secret_key = randomF()
     let msg_limit  = max( 1 , rand(M) )
-    let public_key = compress( secret_key, intToBN254(msg_limit) );
+
+    var public_key : F
+    if globCfg.griffin:
+      public_key = griffin.compress( secret_key, intToBN254(msg_limit) );
+    else:
+      public_key = posei.compression( secret_key, intToBN254(msg_limit) );
 
     assert( msg_limit <= M , "msg limit hard bound failed")
 
@@ -91,6 +98,8 @@ proc genProofInput*( globCfg: GlobalConfig, secretTree: TreeWithSecrets): ProofI
         , merkle_path  : merkle_path
         , msg_idx      : msg_idx
         )
+
+  echo "griffin.compress(1,2) = " & toDecimalF(griffin.compress(toF(1),toF(2)))
 
   let ok = sanityCheckRLNProof( globCfg, proof_inputs, false )
   assert( ok , "RLN proof sanity check failed" )

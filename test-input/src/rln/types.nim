@@ -31,6 +31,7 @@ type
   GlobalConfig* = object
     limit_bits*    : int
     merkle_depth*  : int     
+    griffin*       : bool
 
   ProofInput* = object
     # public inputs
@@ -52,7 +53,7 @@ type
     merkle_path* : seq[F]
 
 const defaultGlobalConfig* = 
-  GlobalConfig( limit_bits: 16 , merkle_depth: 20 )
+  GlobalConfig( limit_bits: 16 , merkle_depth: 20 , griffin: false )
 
 func extractPartialInputs*(input: ProofInput): PartialInput = 
   PartialInput( merkle_root : input.merkle_root 
